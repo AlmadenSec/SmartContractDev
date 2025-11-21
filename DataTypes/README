@@ -1,0 +1,136 @@
+# Solidity Data Types Dictionary
+
+An interactive, offline-capable reference guide for Solidity data types. Built for developers learning smart contract development who want quick access to type information, code examples, and gas optimization tips.
+
+![Solidity](https://img.shields.io/badge/Solidity-0.8.x-363636?logo=solidity)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Offline](https://img.shields.io/badge/Works-Offline-blue)
+
+## Quick Start
+
+1. Download `solidity-data-types-dictionary.html`
+2. Open in any modern browser
+3. Start searching or browsing types
+
+No installation, dependencies, or internet connection required.
+
+## Features
+
+### 🔍 Instant Search
+Type to filter across all data types by name, description, or use case. Find what you need in seconds.
+
+### 🏷️ Category Filters
+Quickly narrow down to:
+- **Value Types** — Integers, booleans, addresses, bytes, enums
+- **Reference Types** — Arrays, mappings, structs, strings
+- **Special** — Data locations, function types, contract types
+
+### 📖 Expandable Cards
+Click any type card to reveal:
+- Detailed descriptions
+- Code examples you can reference
+- Gas optimization tips
+- Member functions and methods
+- Common use cases
+
+### ⚡ Quick Reference Panel
+Default values for all types visible at a glance — no clicking required.
+
+### 🌙 Dark Theme
+Easy on the eyes during long coding sessions.
+
+## What's Covered
+
+| Category | Types |
+|----------|-------|
+| **Integers** | uint8-uint256, int8-int256, gas optimization notes |
+| **Boolean** | bool, operators (!, &&, \|\|, ==, !=) |
+| **Address** | address, address payable, .balance, .transfer, .send, .call |
+| **Bytes** | bytes1-bytes32, function selectors, hash storage |
+| **Enums** | Custom enumerations, state machines |
+| **Arrays** | T[], T[k], bytes, string, .push, .pop, .length |
+| **Mappings** | Simple mappings, nested mappings, iteration patterns |
+| **Structs** | Custom types, storage packing optimization |
+| **Data Locations** | storage, memory, calldata with gas costs |
+| **Special Types** | function types, contract types, type(X) |
+
+## Code Examples
+
+Every type includes practical Solidity code examples. For instance, the `address payable` entry shows all three methods for sending Ether:
+
+```solidity
+// Method 1: transfer (reverts on failure, 2300 gas limit)
+payable(msg.sender).transfer(address(this).balance);
+
+// Method 2: send (returns false on failure, 2300 gas limit)
+bool success = payable(msg.sender).send(1 ether);
+
+// Method 3: call (RECOMMENDED - forwards all gas)
+(bool sent, ) = payable(msg.sender).call{value: 1 ether}("");
+require(sent, "Failed to send Ether");
+```
+
+## Gas Tips
+
+Throughout the dictionary, you'll find gas optimization insights like:
+
+- Why `uint256` is often more efficient than smaller integer types
+- Storage costs (~20,000 gas for new slots vs ~5,000 for updates)
+- When to use `calldata` vs `memory` for function parameters
+- Struct packing strategies to minimize storage slots
+
+## Browser Compatibility
+
+Works in all modern browsers:
+- Chrome / Edge (Chromium)
+- Firefox
+- Safari
+- Opera
+
+## File Structure
+
+```
+solidity-data-types-dictionary.html    # Complete standalone application
+README.md                               # This file
+Solidity_Data_Types_Dictionary.docx     # Printable Word document version
+```
+
+## Customization
+
+The HTML file is self-contained with inline CSS and JavaScript. To customize:
+
+- **Colors**: Modify the CSS variables in the `:root` selector
+- **Content**: Edit the `typesData` object in the `<script>` section
+- **Styling**: All styles are in the `<style>` block
+
+## Adding New Types
+
+To add a new type, locate the `typesData` object and add an entry:
+
+```javascript
+{
+  name: "yourType",
+  badge: "value",  // or "reference" or "special"
+  description: "Brief description",
+  example: `// Code example here`,
+  useCase: "When to use this type",
+  tip: "Optional helpful tip",
+  gasNote: "Optional gas optimization note"
+}
+```
+
+## Contributing
+
+Feel free to fork and extend this reference with:
+- Additional code examples
+- More gas optimization tips
+- New Solidity 0.8.x features
+- Translations
+
+## License
+
+MIT License — Use freely in personal and commercial projects.
+
+---
+
+Built as a learning resource for smart contract development.
