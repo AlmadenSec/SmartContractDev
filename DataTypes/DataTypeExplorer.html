@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solidity Data Types Dictionary</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --code-bg: #1e293b;
+      --border: #475569;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    /* Search and Filter */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 0.875rem 1rem 0.875rem 3rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .search-box::before {
+      content: "🔍";
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+      padding: 0.75rem 1.25rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .filter-tab:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+    
+    .filter-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    /* Category Sections */
+    .category {
+      margin-bottom: 2.5rem;
+    }
+    
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    
+    .category-header:hover {
+      background: var(--bg-secondary);
+    }
+    
+    .category-icon {
+      font-size: 1.5rem;
+    }
+    
+    .category-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    
+    .category-count {
+      background: var(--bg-card);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .category-toggle {
+      margin-left: auto;
+      color: var(--text-secondary);
+      transition: transform 0.3s;
+    }
+    
+    .category.collapsed .category-toggle {
+      transform: rotate(-90deg);
+    }
+    
+    .category.collapsed .types-grid {
+      display: none;
+    }
+    
+    /* Types Grid */
+    .types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1rem;
+    }
+    
+    /* Type Card */
+    .type-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .type-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .type-card.expanded {
+      grid-column: 1 / -1;
+      background: var(--bg-card);
+    }
+    
+    .type-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .type-name {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    .type-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    
+    .badge-value { background: #10b981; color: white; }
+    .badge-reference { background: #8b5cf6; color: white; }
+    .badge-special { background: #f59e0b; color: black; }
+    
+    .type-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .type-details {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .type-card.expanded .type-details {
+      display: block;
+    }
+    
+    .detail-section {
+      margin-bottom: 1rem;
+    }
+    
+    .detail-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    
+    .tip-box {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+    }
+    
+    .tip-box.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-left-color: var(--warning);
+    }
+    
+    .members-list {
+      list-style: none;
+    }
+    
+    .members-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    
+    .members-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .member-name {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      color: var(--success);
+    }
+    
+    /* Quick Reference */
+    .quick-ref {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .quick-ref h3 {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .defaults-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    
+    .default-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-card);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    
+    .default-type {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      color: var(--accent);
+    }
+    
+    .default-value {
+      color: var(--success);
+      font-family: 'Fira Code', 'Consolas', monospace;
+    }
+    
+    /* No results */
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+    
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+      h1 { font-size: 1.8rem; }
+      .types-grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⟠ Solidity Data Types Dictionary</h1>
+      <p class="subtitle">Interactive reference for smart contract development</p>
+    </header>
+    
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search types, keywords, or use cases...">
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="value">Value Types</button>
+        <button class="filter-tab" data-filter="reference">Reference Types</button>
+        <button class="filter-tab" data-filter="special">Special</button>
+      </div>
+    </div>
+    
+    <div class="quick-ref">
+      <h3>⚡ Default Values Quick Reference</h3>
+      <div class="defaults-grid">
+        <div class="default-item"><span class="default-type">uint/int</span><span class="default-value">0</span></div>
+        <div class="default-item"><span class="default-type">bool</span><span class="default-value">false</span></div>
+        <div class="default-item"><span class="default-type">address</span><span class="default-value">0x0...0</span></div>
+        <div class="default-item"><span class="default-type">bytes32</span><span class="default-value">0x0</span></div>
+        <div class="default-item"><span class="default-type">string</span><span class="default-value">""</span></div>
+        <div class="default-item"><span class="default-type">enum</span><span class="default-value">index 0</span></div>
+        <div class="default-item"><span class="default-type">mapping</span><span class="default-value">default(V)</span></div>
+        <div class="default-item"><span class="default-type">struct</span><span class="default-value">defaults</span></div>
+      </div>
+    </div>
+    
+    <div id="types-container"></div>
+    
+    <footer>
+      <p>Solidity Data Types Dictionary • Click any card to expand details</p>
+    </footer>
+  </div>
+
+  <script>
+    const typesData = {
+      integers: {
+        icon: "🔢",
+        title: "Integers",
+        category: "value",
+        types: [
+          {
+            name: "uint256",
+            badge: "value",
+            description: "Unsigned 256-bit integer. The default and most commonly used integer type.",
+            range: "0 to 1.15×10⁷⁷",
+            size: "32 bytes",
+            gasNote: "The EVM operates on 256-bit words, so uint256 is often more gas-efficient than smaller types.",
+            example: `uint256 public totalSupply = 1000000;
+uint256 public balance;
+
+function add(uint256 a, uint256 b) public pure returns (uint256) {
+    return a + b; // Solidity 0.8+ has built-in overflow protection
+}`,
+            useCase: "Balances, token amounts, counters, timestamps, any large number"
+          },
+          {
+            name: "uint8 - uint128",
+            badge: "value",
+            description: "Smaller unsigned integers. Use only when packing multiple values in storage.",
+            range: "uint8: 0-255, uint16: 0-65535, uint32: 0-4.29B, uint64: 0-1.84×10¹⁹",
+            size: "1-16 bytes",
+            gasNote: "Smaller types do NOT save gas by themselves. Only beneficial when packing in structs or with other state variables in the same 32-byte slot.",
+            example: `// Gas-efficient packing example
+struct PackedData {
+    uint64 timestamp;  // 8 bytes
+    uint64 amount;     // 8 bytes  
+    uint64 id;         // 8 bytes
+    uint64 extra;      // 8 bytes = 32 bytes total (1 slot)
+}`,
+            useCase: "Storage packing, loop counters with known bounds, small enumerations"
+          },
+          {
+            name: "int256",
+            badge: "value",
+            description: "Signed 256-bit integer. Can hold negative values.",
+            range: "-5.78×10⁷⁶ to +5.78×10⁷⁶",
+            size: "32 bytes",
+            example: `int256 public temperature = -20;
+int256 public profitLoss;
+
+function calculateChange(int256 before, int256 after) public pure returns (int256) {
+    return after - before; // Can be negative
+}`,
+            useCase: "Values that can be negative: price changes, profit/loss, coordinates"
+          }
+        ]
+      },
+      boolean: {
+        icon: "✓",
+        title: "Boolean",
+        category: "value",
+        types: [
+          {
+            name: "bool",
+            badge: "value",
+            description: "Logical true or false value. Defaults to false.",
+            example: `bool public isActive = true;
+bool public isPaused;  // defaults to false
+
+modifier onlyWhenActive() {
+    require(isActive, "Contract is not active");
+    _;
+}
+
+// Operators: ! (not), && (and), || (or), == (equal), != (not equal)`,
+            useCase: "Flags, access control, feature toggles, conditions"
+          }
+        ]
+      },
+      address: {
+        icon: "📍",
+        title: "Address",
+        category: "value",
+        types: [
+          {
+            name: "address",
+            badge: "value",
+            description: "Holds a 20-byte Ethereum address. Cannot receive Ether directly.",
+            size: "20 bytes",
+            example: `address public owner;
+address public tokenContract = 0x1234...;
+
+function getBalance(address account) public view returns (uint256) {
+    return account.balance;  // Returns balance in Wei
+}`,
+            members: [
+              { name: ".balance", desc: "Returns the address balance in Wei (uint256)" },
+              { name: ".code", desc: "Returns the bytecode at the address (bytes)" },
+              { name: ".codehash", desc: "Returns the keccak256 hash of the code (bytes32)" }
+            ],
+            useCase: "Storing wallet addresses, contract references, ownership"
+          },
+          {
+            name: "address payable",
+            badge: "value",
+            description: "Address that can receive Ether. Has transfer() and send() methods.",
+            size: "20 bytes",
+            example: `address payable public recipient;
+
+function withdraw() public {
+    // Method 1: transfer (reverts on failure, 2300 gas limit)
+    payable(msg.sender).transfer(address(this).balance);
+    
+    // Method 2: send (returns false on failure, 2300 gas limit)
+    bool success = payable(msg.sender).send(1 ether);
+    
+    // Method 3: call (RECOMMENDED - forwards all gas)
+    (bool sent, ) = payable(msg.sender).call{value: 1 ether}("");
+    require(sent, "Failed to send Ether");
+}`,
+            members: [
+              { name: ".transfer(amount)", desc: "Sends Wei, reverts on failure (2300 gas)" },
+              { name: ".send(amount)", desc: "Sends Wei, returns false on failure (2300 gas)" },
+              { name: ".call{value: x}(\"\")", desc: "Low-level call, returns (bool, bytes) - RECOMMENDED" }
+            ],
+            tip: "Always use .call{value: x}(\"\") for sending Ether. The transfer() and send() methods have a 2300 gas limit which can cause failures with contracts that have receive functions.",
+            useCase: "Payment recipients, refund addresses, treasury addresses"
+          }
+        ]
+      },
+      bytes: {
+        icon: "📦",
+        title: "Fixed-Size Bytes",
+        category: "value",
+        types: [
+          {
+            name: "bytes32",
+            badge: "value",
+            description: "Fixed 32-byte array. Most commonly used for hashes and identifiers.",
+            size: "32 bytes",
+            example: `bytes32 public merkleRoot;
+bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
+function hashData(string memory data) public pure returns (bytes32) {
+    return keccak256(abi.encodePacked(data));
+}
+
+// Comparing bytes32 is cheaper than comparing strings
+function checkRole(bytes32 role) public pure returns (bool) {
+    return role == ADMIN_ROLE;
+}`,
+            useCase: "Keccak256 hashes, Merkle roots, role identifiers, storage keys"
+          },
+          {
+            name: "bytes4",
+            badge: "value",
+            description: "Fixed 4-byte array. Used for function selectors.",
+            size: "4 bytes",
+            example: `bytes4 public constant TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
+
+// Function selectors are the first 4 bytes of keccak256(signature)
+function getSelector(string memory sig) public pure returns (bytes4) {
+    return bytes4(keccak256(bytes(sig)));
+}`,
+            useCase: "Function selectors, interface IDs (ERC-165), compact identifiers"
+          },
+          {
+            name: "bytes1 - bytes32",
+            badge: "value",
+            description: "Fixed-size byte arrays from 1 to 32 bytes. Cheaper than dynamic bytes when size is known.",
+            example: `bytes1 public flag = 0x01;        // Single byte
+bytes20 public addrBytes;         // Same size as address
+bytes32 public hash;              // Full word
+
+// Convert address to bytes20
+bytes20 addrAsBytes = bytes20(someAddress);
+
+// Access individual bytes
+bytes32 data = "Hello";
+bytes1 firstByte = data[0];  // 0x48 ('H')`,
+            useCase: "Compact data storage, flags, fixed-length identifiers"
+          }
+        ]
+      },
+      enums: {
+        icon: "📋",
+        title: "Enums",
+        category: "value",
+        types: [
+          {
+            name: "enum",
+            badge: "value",
+            description: "User-defined type with a finite set of constant values. Stored as uint8 internally.",
+            example: `enum Status { 
+    Pending,    // = 0
+    Active,     // = 1
+    Completed,  // = 2
+    Cancelled   // = 3
+}
+
+Status public currentStatus;  // Defaults to Pending (0)
+
+function activate() public {
+    require(currentStatus == Status.Pending, "Invalid status");
+    currentStatus = Status.Active;
+}
+
+// Convert to/from uint
+function getStatusNumber() public view returns (uint8) {
+    return uint8(currentStatus);
+}`,
+            tip: "Enums make your code more readable than using magic numbers. Great for state machines and status tracking.",
+            useCase: "Order states, user roles, approval workflows, game states"
+          }
+        ]
+      },
+      arrays: {
+        icon: "📚",
+        title: "Arrays",
+        category: "reference",
+        types: [
+          {
+            name: "T[]",
+            badge: "reference",
+            description: "Dynamic array that can grow or shrink. Must specify data location in functions.",
+            example: `uint256[] public values;
+address[] public whitelist;
+
+function addValue(uint256 val) public {
+    values.push(val);      // Add to end
+}
+
+function removeLastValue() public {
+    values.pop();          // Remove from end
+}
+
+function getLength() public view returns (uint256) {
+    return values.length;
+}
+
+// Memory arrays have fixed size once created
+function createArray(uint256 size) public pure returns (uint256[] memory) {
+    uint256[] memory arr = new uint256[](size);
+    return arr;
+}`,
+            members: [
+              { name: ".length", desc: "Returns number of elements" },
+              { name: ".push(x)", desc: "Appends element to end (storage only)" },
+              { name: ".push()", desc: "Appends zero element and returns reference" },
+              { name: ".pop()", desc: "Removes last element (storage only)" }
+            ],
+            gasNote: "Iterating over large arrays is expensive. Consider using mappings with a separate counter for large datasets.",
+            useCase: "Lists of addresses, transaction history, ordered collections"
+          },
+          {
+            name: "T[k]",
+            badge: "reference",
+            description: "Fixed-size array with k elements. Size cannot change after creation.",
+            example: `uint256[10] public fixedArray;
+address[3] public admins;
+
+function setAdmin(uint256 index, address admin) public {
+    require(index < 3, "Index out of bounds");
+    admins[index] = admin;
+}
+
+// Fixed arrays in memory
+function getFixedArray() public pure returns (uint256[5] memory) {
+    uint256[5] memory arr = [uint256(1), 2, 3, 4, 5];
+    return arr;
+}`,
+            useCase: "Known-size collections, configuration arrays, small fixed datasets"
+          },
+          {
+            name: "bytes",
+            badge: "reference",
+            description: "Dynamic byte array. Similar to bytes1[] but more tightly packed and cheaper.",
+            example: `bytes public data;
+
+function setData(bytes calldata newData) public {
+    data = newData;
+}
+
+function appendByte(bytes1 b) public {
+    data.push(b);
+}
+
+// Concatenation
+function concat(bytes memory a, bytes memory b) public pure returns (bytes memory) {
+    return abi.encodePacked(a, b);
+}`,
+            useCase: "Arbitrary binary data, dynamic-length payloads, raw calldata"
+          },
+          {
+            name: "string",
+            badge: "reference",
+            description: "Dynamic UTF-8 encoded string. Cannot be indexed or get length directly in Solidity.",
+            example: `string public name = "My Token";
+string public symbol;
+
+function setName(string calldata newName) public {
+    name = newName;
+}
+
+// To get length or compare, convert to bytes
+function getNameLength() public view returns (uint256) {
+    return bytes(name).length;
+}
+
+function compareStrings(string memory a, string memory b) public pure returns (bool) {
+    return keccak256(bytes(a)) == keccak256(bytes(b));
+}`,
+            tip: "String operations are expensive. For fixed identifiers, prefer bytes32 with string literals.",
+            useCase: "Names, URIs, metadata, human-readable identifiers"
+          }
+        ]
+      },
+      mappings: {
+        icon: "🗺️",
+        title: "Mappings",
+        category: "reference",
+        types: [
+          {
+            name: "mapping",
+            badge: "reference",
+            description: "Hash table mapping keys to values. Storage only, cannot be iterated.",
+            example: `// Simple mapping
+mapping(address => uint256) public balances;
+
+// Nested mapping
+mapping(address => mapping(address => uint256)) public allowances;
+
+// Mapping with struct values
+mapping(uint256 => User) public users;
+
+function setBalance(address account, uint256 amount) public {
+    balances[account] = amount;
+}
+
+function getAllowance(address owner, address spender) public view returns (uint256) {
+    return allowances[owner][spender];
+}`,
+            tip: "ALL keys exist and return default values. You cannot check if a key was 'set'. Use a separate bool flag or require non-zero values to verify existence.",
+            gasNote: "Reading from mappings is O(1) and very gas efficient. Much better than iterating arrays for lookups.",
+            useCase: "Balances by address, approvals, ownership records, any key-value lookup"
+          },
+          {
+            name: "mapping patterns",
+            badge: "reference",
+            description: "Common patterns for working with mappings effectively.",
+            example: `// Pattern 1: Iterable mapping (track keys separately)
+mapping(address => uint256) public balances;
+address[] public holders;
+mapping(address => bool) public isHolder;
+
+function addHolder(address holder, uint256 amount) public {
+    if (!isHolder[holder]) {
+        holders.push(holder);
+        isHolder[holder] = true;
+    }
+    balances[holder] = amount;
+}
+
+// Pattern 2: Check existence with struct
+struct User {
+    bool exists;
+    uint256 balance;
+    string name;
+}
+mapping(address => User) public users;
+
+function userExists(address user) public view returns (bool) {
+    return users[user].exists;
+}`,
+            useCase: "When you need to iterate over mapping entries, check key existence"
+          }
+        ]
+      },
+      structs: {
+        icon: "🏗️",
+        title: "Structs",
+        category: "reference",
+        types: [
+          {
+            name: "struct",
+            badge: "reference",
+            description: "Custom type grouping related data together. Can contain any types except itself.",
+            example: `struct User {
+    address wallet;      // 20 bytes
+    uint256 balance;     // 32 bytes
+    uint64 createdAt;    // 8 bytes
+    uint64 lastActive;   // 8 bytes
+    bool isActive;       // 1 byte
+    string name;         // dynamic
+}
+
+mapping(address => User) public users;
+
+function createUser(string calldata name) public {
+    users[msg.sender] = User({
+        wallet: msg.sender,
+        balance: 0,
+        createdAt: uint64(block.timestamp),
+        lastActive: uint64(block.timestamp),
+        isActive: true,
+        name: name
+    });
+}
+
+// Update single field
+function updateBalance(address user, uint256 newBalance) public {
+    users[user].balance = newBalance;
+}`,
+            tip: "Order struct members from largest to smallest for optimal storage packing. Group smaller types together to fit in single 32-byte slots.",
+            useCase: "User profiles, order data, complex records, institutional identity data"
+          }
+        ]
+      },
+      dataLocations: {
+        icon: "💾",
+        title: "Data Locations",
+        category: "special",
+        types: [
+          {
+            name: "storage",
+            badge: "special",
+            description: "Permanent blockchain storage. Persists between function calls. Most expensive.",
+            example: `uint256 public storedValue;  // Automatically storage
+
+function updateStorage(uint256[] storage arr) internal {
+    arr.push(100);  // Modifies actual state
+}
+
+// Storage reference (pointer to state)
+function getStorageRef() internal view returns (uint256[] storage) {
+    return myArray;  // Returns reference, not copy
+}`,
+            gasNote: "Writing to storage: ~20,000 gas (new slot) or ~5,000 gas (update). Reading: ~200 gas. Use sparingly!",
+            useCase: "State variables, permanent data that must survive transactions"
+          },
+          {
+            name: "memory",
+            badge: "special",
+            description: "Temporary storage during function execution. Mutable but not persisted.",
+            example: `function processData(uint256[] memory data) public pure returns (uint256) {
+    // data is a copy, modifications don't affect original
+    data[0] = 999;
+    
+    // Create new memory array
+    uint256[] memory newArr = new uint256[](10);
+    
+    return data[0];
+}
+
+// Structs in memory
+function createTempUser() public pure returns (User memory) {
+    User memory user = User({
+        wallet: address(0),
+        balance: 100,
+        isActive: true
+    });
+    return user;
+}`,
+            useCase: "Function parameters (when mutable), local variables, return values"
+          },
+          {
+            name: "calldata",
+            badge: "special",
+            description: "Read-only, non-modifiable. Cheapest option for external function inputs.",
+            example: `// MOST GAS EFFICIENT for read-only external inputs
+function processNames(string[] calldata names) external pure returns (uint256) {
+    // names[0] = "new";  // ERROR: calldata is immutable
+    return names.length;
+}
+
+function handleBytes(bytes calldata data) external pure returns (bytes4) {
+    return bytes4(data[:4]);  // Slicing works on calldata
+}`,
+            gasNote: "Calldata is the cheapest because it reads directly from transaction data without copying.",
+            useCase: "External function parameters that don't need modification"
+          }
+        ]
+      },
+      specialTypes: {
+        icon: "⚡",
+        title: "Special Types",
+        category: "special",
+        types: [
+          {
+            name: "function",
+            badge: "special",
+            description: "Functions can be stored in variables and passed as parameters.",
+            example: `// Function type declaration
+function(uint256, uint256) external returns (uint256) public mathOperation;
+
+// Store function reference
+function setOperation(function(uint256, uint256) external returns (uint256) op) public {
+    mathOperation = op;
+}
+
+// Internal function types
+function executeCallback(
+    function(uint256) internal returns (uint256) callback,
+    uint256 value
+) internal returns (uint256) {
+    return callback(value);
+}`,
+            useCase: "Callbacks, strategy patterns, upgradeable logic references"
+          },
+          {
+            name: "contract",
+            badge: "special",
+            description: "Every contract defines its own type. Can interact with other contracts.",
+            example: `interface IERC20 {
+    function transfer(address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
+
+contract MyContract {
+    IERC20 public token;
+    
+    constructor(address tokenAddress) {
+        token = IERC20(tokenAddress);
+    }
+    
+    function checkBalance() public view returns (uint256) {
+        return token.balanceOf(address(this));
+    }
+}`,
+            useCase: "Interacting with deployed contracts, dependency injection, interfaces"
+          },
+          {
+            name: "type(X)",
+            badge: "special",
+            description: "Access type information about contracts, interfaces, and integers.",
+            example: `// Contract type info
+bytes4 interfaceId = type(IERC20).interfaceId;
+bytes memory creationCode = type(MyContract).creationCode;
+bytes memory runtimeCode = type(MyContract).runtimeCode;
+
+// Integer type info
+uint256 maxUint = type(uint256).max;  // 2^256 - 1
+uint256 minUint = type(uint256).min;  // 0
+int256 maxInt = type(int256).max;     // 2^255 - 1
+int256 minInt = type(int256).min;     // -2^255`,
+            useCase: "ERC-165 interface detection, bounds checking, contract deployment"
+          }
+        ]
+      }
+    };
+
+    // Render the types
+    function renderTypes(filter = 'all', searchTerm = '') {
+      const container = document.getElementById('types-container');
+      container.innerHTML = '';
+      
+      let hasResults = false;
+      
+      for (const [key, category] of Object.entries(typesData)) {
+        const filteredTypes = category.types.filter(type => {
+          const matchesFilter = filter === 'all' || type.badge === filter || category.category === filter;
+          const matchesSearch = searchTerm === '' || 
+            type.name.toLowerCase().includes(searchTerm) ||
+            type.description.toLowerCase().includes(searchTerm) ||
+            (type.useCase && type.useCase.toLowerCase().includes(searchTerm)) ||
+            (type.example && type.example.toLowerCase().includes(searchTerm));
+          return matchesFilter && matchesSearch;
+        });
+        
+        if (filteredTypes.length === 0) continue;
+        hasResults = true;
+        
+        const categoryEl = document.createElement('div');
+        categoryEl.className = 'category';
+        categoryEl.innerHTML = `
+          <div class="category-header">
+            <span class="category-icon">${category.icon}</span>
+            <span class="category-title">${category.title}</span>
+            <span class="category-count">${filteredTypes.length} type${filteredTypes.length > 1 ? 's' : ''}</span>
+            <span class="category-toggle">▼</span>
+          </div>
+          <div class="types-grid">
+            ${filteredTypes.map(type => renderTypeCard(type)).join('')}
+          </div>
+        `;
+        
+        container.appendChild(categoryEl);
+      }
+      
+      if (!hasResults) {
+        container.innerHTML = `
+          <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <p>No types found matching "${searchTerm}"</p>
+          </div>
+        `;
+      }
+      
+      // Add event listeners
+      document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', () => {
+          header.parentElement.classList.toggle('collapsed');
+        });
+      });
+      
+      document.querySelectorAll('.type-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const wasExpanded = card.classList.contains('expanded');
+          document.querySelectorAll('.type-card.expanded').forEach(c => c.classList.remove('expanded'));
+          if (!wasExpanded) card.classList.add('expanded');
+        });
+      });
+    }
+    
+    function renderTypeCard(type) {
+      return `
+        <div class="type-card">
+          <div class="type-header">
+            <span class="type-name">${type.name}</span>
+            <span class="type-badge badge-${type.badge}">${type.badge}</span>
+          </div>
+          <div class="type-description">${type.description}</div>
+          ${type.useCase ? `<div style="font-size: 0.85rem; color: var(--success);">→ ${type.useCase}</div>` : ''}
+          
+          <div class="type-details">
+            ${type.range ? `<div class="detail-section"><div class="detail-label">Range</div><div>${type.range}</div></div>` : ''}
+            ${type.size ? `<div class="detail-section"><div class="detail-label">Size</div><div>${type.size}</div></div>` : ''}
+            
+            ${type.members ? `
+              <div class="detail-section">
+                <div class="detail-label">Members</div>
+                <ul class="members-list">
+                  ${type.members.map(m => `<li><span class="member-name">${m.name}</span> — ${m.desc}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+            
+            ${type.example ? `
+              <div class="detail-section">
+                <div class="detail-label">Example</div>
+                <div class="code-block">${type.example}</div>
+              </div>
+            ` : ''}
+            
+            ${type.gasNote ? `<div class="detail-section"><div class="tip-box warning">💡 <strong>Gas Tip:</strong> ${type.gasNote}</div></div>` : ''}
+            ${type.tip ? `<div class="detail-section"><div class="tip-box">💡 <strong>Tip:</strong> ${type.tip}</div></div>` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Initialize
+    renderTypes();
+    
+    // Search functionality
+    document.getElementById('search').addEventListener('input', (e) => {
+      const activeFilter = document.querySelector('.filter-tab.active').dataset.filter;
+      renderTypes(activeFilter, e.target.value.toLowerCase());
+    });
+    
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        renderTypes(tab.dataset.filter, searchTerm);
+      });
+    });
+  </script>
+</body>
+</html>
